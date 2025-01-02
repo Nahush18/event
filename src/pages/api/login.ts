@@ -1,5 +1,13 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import pool from '../../lib/db';  // DB connection
+import { RowDataPacket } from 'mysql2'; // Import RowDataPacket to type the rows properly
+
+// Define the structure of the expected user data
+interface User {
+  username: string;
+  password: string;
+  // Add other fields if necessary
+}
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === 'POST') {
@@ -11,13 +19,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     try {
       // Example query to check username and password
-      const [result] = await pool.query(
+      const [rows] = await pool.query<RowDataPacket[] & User[]>(
         'SELECT * FROM users WHERE username = ? AND password = ?',
         [username, password]
       );
-
-      // Accessing 'rows' from the 'result' object
-      const rows = result as Array<any>;
 
       // Check if any rows were returned
       if (rows.length > 0) {
