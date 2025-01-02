@@ -1,3 +1,5 @@
+import Link from 'next/link';
+
 const Navbar = () => {
   return (
     <nav style={{ backgroundColor: '#2d3748', color: 'white', padding: '16px 0', boxShadow: '0px 4px 6px rgba(0, 0, 0, 0.1)', position: 'fixed', width: '100%', top: '0', left: '0', zIndex: 50 }}>
@@ -9,9 +11,9 @@ const Navbar = () => {
 
         {/* Navigation Links */}
         <div style={{ display: 'flex', gap: '24px' }}>
-          <a href="/" style={{ color: 'white', textDecoration: 'none', transition: 'color 0.3s' }}>Home</a>
-          <a href="/login" style={{ color: 'white', textDecoration: 'none', transition: 'color 0.3s' }}>Login</a>
-          <a href="/events" style={{ color: 'white', textDecoration: 'none', transition: 'color 0.3s' }}>Events</a>
+          <Link href="/" style={{ color: 'white', textDecoration: 'none', transition: 'color 0.3s' }}>Home</Link>
+          <Link href="/login" style={{ color: 'white', textDecoration: 'none', transition: 'color 0.3s' }}>Login</Link>
+          <Link href="/events" style={{ color: 'white', textDecoration: 'none', transition: 'color 0.3s' }}>Events</Link>
         </div>
       </div>
     </nav>
