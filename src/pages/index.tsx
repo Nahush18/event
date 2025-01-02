@@ -1,114 +1,167 @@
-import Image from "next/image";
-import { Geist, Geist_Mono } from "next/font/google";
+import { useState, useEffect } from "react";
+import Navbar from "../components/Navbar";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
+type Event = {
+  id: number;
+  title: string;
+  description: string;
+  date: string;
+};
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
+const HomePage = () => {
+  const [events, setEvents] = useState<Event[]>([]);
+  const [newEventTitle, setNewEventTitle] = useState("");
+  const [newEventDescription, setNewEventDescription] = useState("");
+  const [newEventDate, setNewEventDate] = useState("");
 
-export default function Home() {
+  // Fetch events when the component mounts
+  useEffect(() => {
+    const fetchEvents = async () => {
+      const response = await fetch("/api/events");
+      const data = await response.json();
+      if (Array.isArray(data)) {
+        setEvents(data);
+      }
+    };
+    fetchEvents();
+  }, []);
+
+  const handleAddEvent = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const eventData = {
+      title: newEventTitle,
+      description: newEventDescription,
+      date: newEventDate,
+    };
+
+    const response = await fetch("/api/events", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(eventData),
+    });
+
+    const data = await response.json();
+
+    if (response.status === 200) {
+      // After adding the event, fetch the events again to display the latest list
+      const fetchEvents = async () => {
+        const response = await fetch("/api/events");
+        const data = await response.json();
+        if (Array.isArray(data)) {
+          setEvents(data);
+        }
+      };
+      fetchEvents();
+    } else {
+      console.error("Failed to add event:", data.error);
+    }
+  };
+
   return (
-    <div
-      className={`${geistSans.variable} ${geistMono.variable} grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]`}
-    >
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              src/pages/index.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
-
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+    <>
+      <Navbar />
+      <div style={{ minHeight: '100vh', backgroundColor: '#f4f7f6', paddingTop: '80px', paddingBottom: '40px', paddingLeft: '20px', paddingRight: '20px' }}>
+        <h1 style={{ fontSize: '2.5rem', fontWeight: 'bold', textAlign: 'center', marginBottom: '40px', color: '#333' }}>Upcoming Events</h1>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '20px' }}>
+          {events.map((event) => (
+            <div
+              key={event.id}
+              style={{
+                backgroundColor: 'white',
+                padding: '20px',
+                borderRadius: '12px',
+                boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
+                transition: 'transform 0.3s',
+                cursor: 'pointer',
+              }}
+            >
+              <h2 style={{ fontSize: '1.5rem', fontWeight: '600', color: '#222', marginBottom: '10px' }}>{event.title}</h2>
+              <p style={{ color: '#555', marginBottom: '10px' }}>{event.description}</p>
+              <p style={{ color: '#888', fontSize: '0.875rem' }}>Date: {event.date}</p>
+            </div>
+          ))}
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
+
+        {/* Add Event Form */}
+        <div style={{ marginTop: '40px', maxWidth: '500px', marginLeft: 'auto', marginRight: 'auto', backgroundColor: 'white', padding: '30px', borderRadius: '12px', boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)' }}>
+          <h2 style={{ fontSize: '1.25rem', fontWeight: '600', textAlign: 'center', marginBottom: '20px', color: '#333' }}>Add Event</h2>
+          <form onSubmit={handleAddEvent}>
+            <div style={{ marginBottom: '20px' }}>
+              <label htmlFor="eventTitle" style={{ display: 'block', fontSize: '0.875rem', fontWeight: '500', color: '#555' }}>Event Title</label>
+              <input
+                type="text"
+                id="eventTitle"
+                value={newEventTitle}
+                onChange={(e) => setNewEventTitle(e.target.value)}
+                style={{
+                  width: '100%',
+                  padding: '12px',
+                  borderRadius: '8px',
+                  border: '1px solid #ccc',
+                  marginTop: '8px',
+                  fontSize: '1rem',
+                }}
+                required
+              />
+            </div>
+            <div style={{ marginBottom: '20px' }}>
+              <label htmlFor="eventDescription" style={{ display: 'block', fontSize: '0.875rem', fontWeight: '500', color: '#555' }}>Description</label>
+              <textarea
+                id="eventDescription"
+                value={newEventDescription}
+                onChange={(e) => setNewEventDescription(e.target.value)}
+                style={{
+                  width: '100%',
+                  padding: '12px',
+                  borderRadius: '8px',
+                  border: '1px solid #ccc',
+                  marginTop: '8px',
+                  fontSize: '1rem',
+                }}
+                required
+              />
+            </div>
+            <div style={{ marginBottom: '20px' }}>
+              <label htmlFor="eventDate" style={{ display: 'block', fontSize: '0.875rem', fontWeight: '500', color: '#555' }}>Date</label>
+              <input
+                type="date"
+                id="eventDate"
+                value={newEventDate}
+                onChange={(e) => setNewEventDate(e.target.value)}
+                style={{
+                  width: '100%',
+                  padding: '12px',
+                  borderRadius: '8px',
+                  border: '1px solid #ccc',
+                  marginTop: '8px',
+                  fontSize: '1rem',
+                }}
+                required
+              />
+            </div>
+            <button
+              type="submit"
+              style={{
+                width: '100%',
+                padding: '14px',
+                backgroundColor: '#007bff',
+                color: 'white',
+                fontSize: '1rem',
+                fontWeight: '600',
+                borderRadius: '8px',
+                cursor: 'pointer',
+                transition: 'background-color 0.3s',
+              }}
+            >
+              Add Event
+            </button>
+          </form>
+        </div>
+      </div>
+    </>
   );
-}
+};
+
+export default HomePage;
