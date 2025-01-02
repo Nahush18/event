@@ -6,7 +6,7 @@ const Navbar = () => {
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0 24px' }}>
         {/* Logo */}
         <div style={{ fontSize: '24px', fontWeight: '600', color: 'white' }}>
-          <a href="/" style={{ color: 'white', textDecoration: 'none', transition: 'color 0.3s' }}>Eventic</a>
+          <Link href="/" style={{ color: 'white', textDecoration: 'none', transition: 'color 0.3s' }}>Eventic</Link>
         </div>
 
         {/* Navigation Links */}
