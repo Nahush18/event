@@ -11,13 +11,16 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     try {
       // Example query to check username and password
-      const [rows] = await pool.query(
+      const [result] = await pool.query(
         'SELECT * FROM users WHERE username = ? AND password = ?',
         [username, password]
       );
 
-      // Check if any rows were returned (rows is an array)
-      if (Array.isArray(rows) && rows.length > 0) {
+      // Accessing 'rows' from the 'result' object
+      const rows = result as Array<any>;
+
+      // Check if any rows were returned
+      if (rows.length > 0) {
         // Assuming login is successful
         res.status(200).json({ message: 'Login successful' });
       } else {
