@@ -16,7 +16,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         [username, password]
       );
 
-      if (rows.length > 0) {
+      // Check if any rows were returned (rows is an array)
+      if (Array.isArray(rows) && rows.length > 0) {
         // Assuming login is successful
         res.status(200).json({ message: 'Login successful' });
       } else {
